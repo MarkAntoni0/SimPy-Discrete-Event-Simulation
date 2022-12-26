@@ -56,45 +56,45 @@ def activity_generator(env, orderingStation_dist_mean, paymentWindow_dist_mean, 
         #freeze until that time is elapsed
         yield env.timeout(abs(sampled_ordering_time))
 
-    #the ordering phase is completed and the customer can move to payment
-    time_entered_for_payment = env.now
-    # request a slot for payment
-    with paymentWindowsSlots.request() as req:
-        #freeze until there is a slot available
-        yield req
+        #the ordering phase is completed and the customer can move to payment
+        time_entered_for_payment = env.now
+        # request a slot for payment
+        with paymentWindowsSlots.request() as req:
+            #freeze until there is a slot available
+            yield req
 
-        time_left_for_payment = env.now
-        time_inQueue_for_payment = time_left_for_payment - time_entered_for_payment
-        print("Customer ", p_id, " queued for payment for ", time_inQueue_for_payment, " seconds",sep="")
+            time_left_for_payment = env.now
+            time_inQueue_for_payment = time_left_for_payment - time_entered_for_payment
+            print("Customer ", p_id, " queued for payment for ", time_inQueue_for_payment, " seconds",sep="")
 
-        # add the calculated time into the list to get the average
-        list_of_queueing_time_paying.append(time_inQueue_for_payment)
+            # add the calculated time into the list to get the average
+            list_of_queueing_time_paying.append(time_inQueue_for_payment)
 
-        #sample time spent in payment
-        sampled_payment_time = numpy.random.triangular(paymentWindow_dist_min, paymentWindow_dist_mean, paymentWindow_dist_max)
+            #sample time spent in payment
+            sampled_payment_time = numpy.random.triangular(paymentWindow_dist_min, paymentWindow_dist_mean, paymentWindow_dist_max)
 
-        #freeze until that time is elapsed
-        yield env.timeout(sampled_payment_time)
+            #freeze until that time is elapsed
+            yield env.timeout(sampled_payment_time)
 
-    #the payment phase is completed and the customer can move to pickup
-    time_entered_for_pickup = env.now
-    # request a slot for pickup
-    with pickUpWindowsSlots.request() as req:
-        #freeze until there is a slot available
-        yield req
+            #the payment phase is completed and the customer can move to pickup
+            time_entered_for_pickup = env.now
+            # request a slot for pickup
+            with pickUpWindowsSlots.request() as req:
+                #freeze until there is a slot available
+                yield req
 
-        time_left_for_pickup = env.now
-        time_inQueue_for_pickup = time_left_for_pickup - time_entered_for_pickup
-        print("Customer ", p_id, " queued for pick up for ", time_inQueue_for_pickup, " seconds",sep="")
+                time_left_for_pickup = env.now
+                time_inQueue_for_pickup = time_left_for_pickup - time_entered_for_pickup
+                print("Customer ", p_id, " queued for pick up for ", time_inQueue_for_pickup, " seconds",sep="")
 
-        # add the calculated time into the list to get the average
-        list_of_queueing_time_pickingUp.append(time_inQueue_for_pickup)
+                # add the calculated time into the list to get the average
+                list_of_queueing_time_pickingUp.append(time_inQueue_for_pickup)
 
-        #sample time spent in pickup
-        sampled_pickup_time = numpy.random.lognormal(pickUpWindows_dist_mean, pickUpWindows_dist_sd)
+                #sample time spent in pickup
+                sampled_pickup_time = numpy.random.lognormal(pickUpWindows_dist_mean, pickUpWindows_dist_sd)
 
-        # freeze until that time is elapsed
-        yield env.timeout(sampled_pickup_time)
+                # freeze until that time is elapsed
+                yield env.timeout(sampled_pickup_time)
 
 #setup the simulation environment
 env = simpy.Environment()
